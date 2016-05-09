@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -34,17 +36,48 @@ public class DatabaseService {
         this.dataSource = dataSource;
     }
 
-    public Optional<ProviderInfo> getProviderInfo(String providerNumber) throws SQLException {
+    public Optional<ProviderInfo> getProviderInfoByNumber(String providerNumber) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("select * from import.provider_info where " +
                     "provnum = ?")) {
                 statement.setString(1, providerNumber);
-                LOGGER.error("here is the provider number: " + providerNumber);
+
                 ResultSet results = statement.executeQuery();
                 if(!results.next()) {
                     return Optional.empty();
                 }
+                if(results.getFetchSize() > 1) {
+                    throw new SQLException("Too many results");
+                }
                 return Optional.of(new ProviderInfo(results));
+            } catch (SQLException e) {
+                LOGGER.error("Sql exception: ", e);
+                throw e;
+            }
+        }
+    }
+
+    public List<ProviderInfo> searchProviderInfoByName(String searchString) throws SQLException {
+
+        String[] searchStrings = searchString.trim().split(" ");
+        LOGGER.error(searchStrings.toString());
+        StringBuilder statementBuilder = new StringBuilder("select * from import.provider_info where provname like ?");
+        for(int i = 0; i < searchStrings.length; i++) {
+            statementBuilder.append(" and like ? ");
+        }
+        LOGGER.error(statementBuilder.toString());
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(statementBuilder.toString())) {
+                for(int i = 1; i <= searchString.length(); i++) {
+                    statement.setString(i, "%" + searchStrings[i-1] + "%");
+                }
+                ResultSet results = statement.executeQuery();
+
+                List<ProviderInfo> providers = new ArrayList<>();
+                while(results.next()) {
+                    providers.add(new ProviderInfo(results));
+                }
+                return providers;
             } catch (SQLException e) {
                 LOGGER.error("Sql exception: ", e);
                 throw e;

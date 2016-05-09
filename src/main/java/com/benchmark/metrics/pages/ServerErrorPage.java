@@ -1,13 +1,12 @@
 package com.benchmark.metrics.pages;
 
-import com.hp.gagawa.java.Document;
 import com.hp.gagawa.java.DocumentType;
 import com.hp.gagawa.java.elements.P;
 
 /**
  * @author jsanderson
  */
-public class ServerErrorPage extends Document {
+public class ServerErrorPage extends BasePage {
 
     private final Exception exception;
 
@@ -19,5 +18,10 @@ public class ServerErrorPage extends Document {
 
     private void createBody() {
         body.appendChild(new P().appendText("Server Error: " + exception.getMessage()));
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Server Error";
     }
 }
