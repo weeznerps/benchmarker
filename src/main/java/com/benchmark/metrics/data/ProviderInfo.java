@@ -2,6 +2,9 @@ package com.benchmark.metrics.data;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+
+import org.apache.commons.lang3.text.WordUtils;
 
 /**
  * @author jsanderson
@@ -65,21 +68,21 @@ public class ProviderInfo {
                 Rating.getRating(resultSet.getString(QUALITY_RATING_COLUMN)),
                 Rating.getRating(resultSet.getString(STAFFING_RATING_COLUMN)),
                 Rating.getRating(resultSet.getString(RN_STAFFING_RATING_COLUMN)),
-                Double.valueOf(resultSet.getString(CNA_STAFFING_HOURS_COLUMN)),
-                Double.valueOf(resultSet.getString(LPN_STAFFING_HOURS_COLUMN)),
-                Double.valueOf(resultSet.getString(RN_STAFFING_HOURS_COLUMN)),
-                Double.valueOf(resultSet.getString(LICENCSED_STAFFING_HOURS_COLUMN)),
-                Double.valueOf(resultSet.getString(TOTAL_NURSE_STAFFLING_HOURS_COLUMN)));
+              returnNullOrDouble(resultSet.getString(CNA_STAFFING_HOURS_COLUMN)),
+              returnNullOrDouble(resultSet.getString(LPN_STAFFING_HOURS_COLUMN)),
+              returnNullOrDouble(resultSet.getString(RN_STAFFING_HOURS_COLUMN)),
+              returnNullOrDouble(resultSet.getString(LICENCSED_STAFFING_HOURS_COLUMN)),
+              returnNullOrDouble(resultSet.getString(TOTAL_NURSE_STAFFLING_HOURS_COLUMN)));
     }
 
-    public ProviderInfo(String providerNumber, String providerName, String address, String city, State state, int
-            zipcode, String phoneNumber, OwnershipType ownershipType, int numBeds, int
+    public ProviderInfo(String providerNumber, String providerName, String address, String city, State state, Integer
+            zipcode, String phoneNumber, OwnershipType ownershipType, Integer numBeds, Integer
                                 occupiedBeds, ProviderType providerType, Rating overallRating, Rating
                                 healthInspectionRating, Rating
                                 qualityRating, Rating
-                                staffingRating, Rating rnStaffingRating, double cnaStaffingHours, double
-                                lpnStaffingHours, double
-                                rnStaffingHours, double licenscedStaffingHours, double totalNurseStaffingHours) {
+                                staffingRating, Rating rnStaffingRating, Double cnaStaffingHours, Double
+                                lpnStaffingHours, Double
+                                rnStaffingHours, Double licenscedStaffingHours, Double totalNurseStaffingHours) {
         this.providerNumber = providerNumber;
         this.providerName = providerName;
         this.address = address;
@@ -111,9 +114,18 @@ public class ProviderInfo {
         return providerName;
     }
 
+    public String getPrettyProviderName() {
+        return WordUtils.capitalizeFully(providerName);
+    }
+
     public String getAddress() {
         return address;
     }
+
+    public String getPrettyAddress() {
+        return WordUtils.capitalizeFully(providerName);
+    }
+
 
     public String getCity() {
         return city;
@@ -145,6 +157,18 @@ public class ProviderInfo {
 
     public Integer getOccupiedBeds() {
         return occupiedBeds;
+    }
+
+    public Double getOccupiedBedPct() {
+        if(getNumBeds() == null || getOccupiedBeds() == null) {
+            return null;
+        }
+
+        return (Double.valueOf(getOccupiedBeds()) / Double.valueOf(getNumBeds()));
+    }
+
+    public String getOccupiedBedPctString() {
+        return DecimalFormat.getPercentInstance().format(getOccupiedBedPct());
     }
 
     public Rating getOverallRating() {
@@ -187,8 +211,15 @@ public class ProviderInfo {
         return totalNurseStaffingHours;
     }
 
+    private static Double returnNullOrDouble(String value) {
+        if(value.equals("")) {
+            return null;
+        }
+        return Double.valueOf(value);
+    }
+
     public enum Rating {
-        _1(1), _2(2), _3(3), _4(4), _5(5);
+        _1(1), _2(2), _3(3), _4(4), _5(5), NA(0);
 
         private int value;
 
@@ -210,6 +241,9 @@ public class ProviderInfo {
         }
 
         public static Rating getRating(String value) {
+            if(value.equals("")) {
+                return NA;
+            }
             return getRating(Integer.valueOf(value));
         }
     }

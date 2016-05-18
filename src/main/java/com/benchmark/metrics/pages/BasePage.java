@@ -1,5 +1,7 @@
 package com.benchmark.metrics.pages;
 
+import javax.ws.rs.core.UriInfo;
+
 import com.hp.gagawa.java.Document;
 import com.hp.gagawa.java.DocumentType;
 import com.hp.gagawa.java.elements.Meta;
@@ -10,8 +12,11 @@ import com.hp.gagawa.java.elements.Title;
  */
 public abstract class BasePage extends Document {
 
-    public BasePage(DocumentType spec) {
-        super(spec);
+    protected final UriInfo uriInfo;
+
+    public BasePage(UriInfo uriInfo) {
+        super(DocumentType.HTMLStrict);
+        this.uriInfo = uriInfo;
         createHead();
     }
 

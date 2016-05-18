@@ -59,16 +59,14 @@ public class DatabaseService {
 
     public List<ProviderInfo> searchProviderInfoByName(String searchString) throws SQLException {
 
-        String[] searchStrings = searchString.trim().split(" ");
-        LOGGER.error(searchStrings.toString());
-        StringBuilder statementBuilder = new StringBuilder("select * from import.provider_info where provname like ?");
-        for(int i = 0; i < searchStrings.length; i++) {
-            statementBuilder.append(" and like ? ");
+        String[] searchStrings = searchString.toLowerCase().trim().split(" ");
+        StringBuilder statementBuilder = new StringBuilder("select * from import.provider_info where lower(provname) like ?");
+        for(int i = 1; i < searchStrings.length; i++) {
+            statementBuilder.append(" AND lower(provname) like ? ");
         }
-        LOGGER.error(statementBuilder.toString());
         try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(statementBuilder.toString())) {
-                for(int i = 1; i <= searchString.length(); i++) {
+            try (PreparedStatement statement = connection.prepareStatement(statementBuilder.toString().trim())) {
+                for(int i = 1; i <= searchStrings.length; i++) {
                     statement.setString(i, "%" + searchStrings[i-1] + "%");
                 }
                 ResultSet results = statement.executeQuery();

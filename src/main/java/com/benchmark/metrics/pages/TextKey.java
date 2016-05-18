@@ -1,4 +1,4 @@
-package com.benchmark.metrics.jaxrs;
+package com.benchmark.metrics.pages;
 
 /**
  * @author jsanderson

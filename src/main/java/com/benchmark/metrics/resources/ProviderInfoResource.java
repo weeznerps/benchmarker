@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 
 import com.benchmark.metrics.data.ProviderInfo;
 import com.benchmark.metrics.data.StateAverage;
-import com.benchmark.metrics.pages.ProviderInfoComparePage;
+import com.benchmark.metrics.hk2.PageFactory;
 import com.benchmark.metrics.postgres.DatabaseService;
 
 /**
@@ -30,10 +30,12 @@ public class ProviderInfoResource {
     public static final String PROVIDER_NUM_PATH_PARAM = "providerNum";
 
     private final DatabaseService databaseService;
+    private final PageFactory pageFactory;
 
     @Inject
-    public ProviderInfoResource(DatabaseService databaseService) {
+    public ProviderInfoResource(DatabaseService databaseService, PageFactory pageFactory) {
         this.databaseService = databaseService;
+        this.pageFactory = pageFactory;
     }
 
     @GET
@@ -44,7 +46,7 @@ public class ProviderInfoResource {
             ProviderInfo providerInfo = providerInfoOptional.get();
             StateAverage stateAverage = databaseService.getStateAverage(providerInfo.getState());
             StateAverage nationalAverage = databaseService.getNationAverage();
-            return Response.ok(new ProviderInfoComparePage(providerInfo, stateAverage, nationalAverage)).build();
+            return Response.ok(pageFactory.getProviderInfoPage(providerInfo, stateAverage, nationalAverage)).build();
         }
         throw new NotFoundException();
     }

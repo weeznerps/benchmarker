@@ -1,6 +1,9 @@
 package com.benchmark.metrics.pages;
 
-import com.hp.gagawa.java.DocumentType;
+import static com.benchmark.metrics.jaxrs.TextMapper.getText;
+
+import javax.ws.rs.core.UriInfo;
+
 import com.hp.gagawa.java.elements.A;
 import com.hp.gagawa.java.elements.H1;
 import com.hp.gagawa.java.elements.P;
@@ -9,21 +12,25 @@ import com.hp.gagawa.java.elements.P;
  * @author jsanderson .
  */
 public class HomePage extends BasePage{
-    public HomePage() {
-        super(DocumentType.HTMLStrict);
+    public HomePage(UriInfo uriInfo) {
+        super(uriInfo);
         createBody();
     }
 
     public void createBody() {
         body.appendChild(
-                new H1().appendText("Benchmark Metrics"),
-                new P().appendText("Welcome to Medicare benchmark metrics."),
-                new A().appendText("Click here to begin searching").setHref("./search")
+                new H1().appendText(getText(Content.HEADER)),
+                new P().appendText(getText(Content.WELCOME)),
+                new A().appendText(getText(Content.SEARCH_LINK)).setHref(uriInfo.getBaseUri().getPath() + "search")
         );
     }
 
     @Override
     public String getPageTitle() {
-        return "Benchmark Metrics Home";
+        return getText(Content.TITLE);
+    }
+
+    public enum Content implements TextKey {
+        TITLE, HEADER, WELCOME, SEARCH_LINK;
     }
 }

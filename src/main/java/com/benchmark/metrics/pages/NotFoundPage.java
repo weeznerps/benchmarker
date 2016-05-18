@@ -1,6 +1,9 @@
 package com.benchmark.metrics.pages;
 
-import com.hp.gagawa.java.DocumentType;
+import static com.benchmark.metrics.jaxrs.TextMapper.getText;
+
+import javax.ws.rs.core.UriInfo;
+
 import com.hp.gagawa.java.elements.P;
 
 /**
@@ -8,17 +11,21 @@ import com.hp.gagawa.java.elements.P;
  */
 public class NotFoundPage extends BasePage {
 
-    public NotFoundPage() {
-        super(DocumentType.HTMLStrict);
+    public NotFoundPage(UriInfo uriInfo) {
+        super(uriInfo);
         createBody();
     }
 
     public void createBody() {
-        body.appendChild(new P().appendText("Oh no! Not found!"));
+        body.appendChild(new P().appendText(getText(Content.MESSAGE)));
     }
 
     @Override
     public String getPageTitle() {
-        return "Not Found";
+        return getText(Content.TITLE);
+    }
+
+    public enum Content implements TextKey {
+        TITLE, MESSAGE;
     }
 }

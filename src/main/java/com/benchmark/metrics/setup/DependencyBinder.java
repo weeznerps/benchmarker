@@ -11,6 +11,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.benchmark.metrics.hk2.PageFactory;
 import com.benchmark.metrics.postgres.DatabaseService;
 
 /**
@@ -25,6 +26,11 @@ class DependencyBinder extends AbstractBinder {
         bindCommon();
         bindServices();
         bindDataSource();
+        bindFactories();
+    }
+
+    private void bindFactories() {
+        bindAsContract(PageFactory.class).in(Singleton.class);
     }
 
     private void bindCommon() {
